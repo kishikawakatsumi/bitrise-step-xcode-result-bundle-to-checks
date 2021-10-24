@@ -1,0 +1,50 @@
+title: |-
+  Xcode Result Bundle to Checks
+summary: |
+  Generates a human-readable test report from the Xcode result bundle and shows it on GitHub Checks.
+description: |
+  Generates a human-readable test report from the Xcode result bundle and shows it on GitHub Checks.
+website: https://github.com/kishikawakatsumi/bitrise-step-xcode-result-bundle-to-checks
+source_code_url: https://github.com/kishikawakatsumi/bitrise-step-xcode-result-bundle-to-checks
+support_url: https://github.com/kishikawakatsumi/bitrise-step-xcode-result-bundle-to-checks/issues
+host_os_tags:
+  - osx-10.10
+
+project_type_tags:
+  - ios
+  - macos
+
+type_tags:
+  - test
+
+is_requires_admin_user: true
+is_always_run: true
+is_skippable: true
+run_if: ".IsCI"
+
+deps:
+  brew:
+    - name: git
+    - name: wget
+
+toolkit:
+  bash:
+    entry_file: step.sh
+
+inputs:
+  - xcresult_path: $BITRISE_XCRESULT_PATH
+    opts:
+      title: "Result bundle path"
+      summary: Path to the xcresult bundle.
+      description: |
+        Path to the xcresult bundle.
+      is_expand: true
+      is_required: true
+  - title: "Xcode test results"
+    opts:
+      title: "Title"
+      summary: Title for the check results.
+      description: |
+        Title for the check results.
+      is_expand: true
+      is_required: false

@@ -1,0 +1,17 @@
+{
+  "scripts": {
+    "build": "tsc",
+    "package": "ncc build lib/main.js  --source-map --license licenses.txt",
+    "all": "npm run build && npm run package"
+  },
+  "dependencies": {
+    "axios": "^0.23.0",
+    "glob": "^7.2.0",
+    "xcresulttool": "github:kishikawakatsumi/xcresulttool"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@vercel/ncc": "^0.31.1",
+    "ts-node": "^10.4.0"
+  }
+}
