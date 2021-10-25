@@ -18,7 +18,7 @@ Here is [an example result](https://github.com/kishikawakatsumi/xcresulttool-exa
 
 ### Install Helper GitHub App
 
-GitHub Checks can only be updated via the GitHub App. Therefore, to use this step, install this Xcode Result to Check app in your repository.
+GitHub Checks can only be updated via the GitHub App. Therefore, to use this step, install this [Xcode Result to Check](https://github.com/apps/xcode-result-to-check) app in your repository.
 
 https://github.com/apps/xcode-result-to-check
 
