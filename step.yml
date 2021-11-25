@@ -43,6 +43,30 @@ inputs:
       summary: Title for the check results.
       title: Title
 
+  - show_passed_tests: true
+    opts:
+      description: |
+        Whether to show passed tests.
+      is_expand: true
+      is_required: false
+      summary: Whether to show passed tests.
+      title: Show passed tests
+      value_options:
+        - "false"
+        - "true"
+
+  - show_code_coverage: true
+    opts:
+      description: |
+        Whether to show code coverage.
+      is_expand: true
+      is_required: false
+      summary: Whether to show code coverage.
+      title: Show code coverage
+      value_options:
+        - "false"
+        - "true"
+
   - github_owner: $BITRISEIO_GIT_REPOSITORY_OWNER
     opts:
       description: |
