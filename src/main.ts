@@ -8,34 +8,36 @@ const { stat } = promises;
 
 async function run(): Promise<void> {
   try {
-    const inputPath: string | undefined = process.env["INPUT_PATH"];
-    if (!inputPath) {
-      return;
-    }
+    const inputPaths = getMultilineInput("path");
+    const showPassedTests = getBooleanInput("show-passed-tests");
+    const showCodeCoverage = getBooleanInput("show-code-coverage");
 
-    const paths = inputPath.split("\n");
-    const existPaths: string[] = [];
-    for (const checkPath of paths) {
+    const bundlePaths: string[] = [];
+    for (const checkPath of inputPaths) {
       try {
         await stat(checkPath);
-        existPaths.push(checkPath);
+        bundlePaths.push(checkPath);
       } catch (error) {
         console.error((error as Error).message);
       }
     }
     let bundlePath = path.join(os.tmpdir(), "Merged.xcresult");
-    if (paths.length > 1) {
-      await mergeResultBundle(existPaths, bundlePath);
+    if (inputPaths.length > 1) {
+      await mergeResultBundle(bundlePaths, bundlePath);
     } else {
+      const inputPath = inputPaths[0];
       await stat(inputPath);
       bundlePath = inputPath;
     }
 
     const formatter = new Formatter(bundlePath);
-    const report = await formatter.format();
+    const report = await formatter.format({
+      showPassedTests,
+      showCodeCoverage,
+    });
 
     const charactersLimit = 65535;
-    let title = process.env["INPUT_TITLE"] || "Xcode test results";
+    let title = getInput("title");
     if (title.length > charactersLimit) {
       console.error(
         `The 'title' will be truncated because the character limit (${charactersLimit}) exceeded.`
@@ -64,12 +66,25 @@ async function run(): Promise<void> {
     }
     const annotations = report.annotations.slice(0, 50);
 
-    console.log(reportSummary);
-    console.log(reportDetail);
-
     const owner = process.env["INPUT_GITHUB_OWNER"];
     const repo = process.env["INPUT_GITHUB_REPO"];
     const sha = process.env["INPUT_GITHUB_SHA"];
+
+    let output;
+    if (reportDetail.trim()) {
+      output = {
+        title: "Xcode test results",
+        summary: reportSummary,
+        text: reportDetail,
+        annotations,
+      };
+    } else {
+      output = {
+        title: "Xcode test results",
+        summary: reportSummary,
+        annotations,
+      };
+    }
 
     await axios.post(
       `https://make-check.vercel.app/repos/${owner}/${repo}/check-runs`,
@@ -82,12 +97,7 @@ async function run(): Promise<void> {
         external_id: process.env["BITRISE_BUILD_NUMBER"],
         status: "completed",
         conclusion: report.testStatus,
-        output: {
-          title: "Xcode test results",
-          summary: reportSummary,
-          text: reportDetail,
-          annotations,
-        },
+        output,
       },
       {
         headers: {
@@ -115,4 +125,43 @@ async function mergeResultBundle(
   };
 
   await exec.exec("xcrun", args, options);
+}
+
+function getInput(name: string, options?: InputOptions): string {
+  const val: string =
+    process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
+  if (options && options.required && !val) {
+    throw new Error(`Input required and not supplied: ${name}`);
+  }
+
+  if (options && options.trimWhitespace === false) {
+    return val;
+  }
+
+  return val.trim();
+}
+
+function getMultilineInput(name: string, options?: InputOptions): string[] {
+  const inputs: string[] = getInput(name, options)
+    .split("\n")
+    .filter((x) => x !== "");
+
+  return inputs;
+}
+
+function getBooleanInput(name: string, options?: InputOptions): boolean {
+  const trueValue = ["true", "True", "TRUE"];
+  const falseValue = ["false", "False", "FALSE"];
+  const val = getInput(name, options);
+  if (trueValue.includes(val)) return true;
+  if (falseValue.includes(val)) return false;
+  throw new TypeError(
+    `Input does not meet YAML 1.2 "Core Schema" specification: ${name}\n` +
+      `Support boolean input list: \`true | True | TRUE | false | False | FALSE\``
+  );
+}
+
+interface InputOptions {
+  required?: boolean;
+  trimWhitespace?: boolean;
 }
