@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@types/glob": "7.2.0",
-    "@vercel/ncc": "0.33.3",
+    "@vercel/ncc": "0.33.4",
     "ts-node": "10.7.0"
   }
 }
