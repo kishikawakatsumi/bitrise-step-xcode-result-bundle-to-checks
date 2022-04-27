@@ -5,7 +5,7 @@
     "all": "npm run build && npm run package"
   },
   "dependencies": {
-    "axios": "0.27.1",
+    "axios": "0.27.2",
     "glob": "8.0.1",
     "xcresulttool": "github:kishikawakatsumi/xcresulttool"
   },
