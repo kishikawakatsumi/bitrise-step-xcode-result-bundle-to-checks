@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "axios": "0.27.2",
-    "glob": "8.0.3",
+    "glob": "9.3.0",
     "xcresulttool": "github:kishikawakatsumi/xcresulttool"
   },
   "devDependencies": {
